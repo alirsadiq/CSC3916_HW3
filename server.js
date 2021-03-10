@@ -78,10 +78,6 @@ router.post('//signin', function (req, res) {
         })
     })
 });
-
-app.use('/', router);
-app.listen(process.env.PORT || 8080);
-module.exports = app; // for testing only
 router.route('//movie')
     .post(authJwtController.isAuthenticated, function (req, res) {
         console.log(req.body);
@@ -156,3 +152,7 @@ router.route('//movie')
             }
         })
     });
+
+app.use('/', router);
+app.listen(process.env.PORT || 8080);
+module.exports = app; // for testing only
