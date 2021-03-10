@@ -1,9 +1,3 @@
-/*
-CSC3916 HW2
-File: Server.js
-Description: Web API scaffolding for Movie API
- */
-
 var express = require('express');
 var bodyParser = require('body-parser');
 var passport = require('passport');
@@ -12,7 +6,6 @@ var authJwtController = require('./auth_jwt');
 var jwt = require('jsonwebtoken');
 var cors = require('cors');
 var User = require('./Users');
-var Movie = require('./Movie');
 
 var app = express();
 app.use(cors());
@@ -85,6 +78,10 @@ router.post('//signin', function (req, res) {
         })
     })
 });
+
+app.use('/', router);
+app.listen(process.env.PORT || 8080);
+module.exports = app; // for testing only
 router.route('//movie')
     .post(authJwtController.isAuthenticated, function (req, res) {
         console.log(req.body);
@@ -159,9 +156,3 @@ router.route('//movie')
             }
         })
     });
-
-app.use('/', router);
-app.listen(process.env.PORT || 8080);
-module.exports = app; // for testing only
-
-
