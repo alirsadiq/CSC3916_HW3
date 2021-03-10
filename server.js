@@ -78,7 +78,7 @@ router.post('/signin', function (req, res) {
         })
     })
 });
-router.route('//movie')
+router.route('/movie')
     .post(authJwtController.isAuthenticated, function (req, res) {
         console.log(req.body);
         var movie = new Movie();
@@ -111,10 +111,9 @@ router.route('//movie')
     })
     //find a movie vy id
     .get(authJwtController.isAuthenticated, function (req, res) {
-        var id = req.params.movieid;
-        Movie.findById(id, function (err, movie) {
+        Movie.findOne({title : req.body.title}, function (err, movies) {
             if (err) res.send(err);
-            res.json(movie);
+            res.json(movies);
         })
     })
 
@@ -132,18 +131,17 @@ router.route('//movie')
                 res.json({msg :"The movie was successfully removed"})
         })
     })
-    //update movie by id
+    //update movie
     .put(authJwtController.isAuthenticated, function (req, res) {
-        var conditions = {_id: req.params.id};
         Movie.findOne({title: req.body.title}, function(err) {
             if (err) {
                 res.json({message: "Error something went wrong please try again\n", error: err});
             }
 
             else {
-                Movie.updateOne(conditions, req.body)
-                    .then(mov => {
-                        if (!mov) {
+                Movie.updateOne( req.body)
+                    .then(update => {
+                        if (!update) {
                             return res.status(404).end();
                         }
                         return res.status(200).json({msg: "Movie has been updated"})
