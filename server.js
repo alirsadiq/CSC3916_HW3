@@ -12,6 +12,7 @@ var authJwtController = require('./auth_jwt');
 var jwt = require('jsonwebtoken');
 var cors = require('cors');
 var User = require('./Users');
+var Movie = require('./Movie');
 
 var app = express();
 app.use(cors());
@@ -84,6 +85,80 @@ router.post('//signin', function (req, res) {
         })
     })
 });
+router.route('//movie')
+    .post(authJwtController.isAuthenticated, function (req, res) {
+        console.log(req.body);
+        var movie = new Movie();
+        movie.title = req.body.title;
+        movie.yearReleased = req.body.yearReleased;
+        movie.genre = req.body.genre;
+        movie.actors = req.body.actors;
+
+        Movie.findOne({title: req.body.title}, function(err, found){
+            if(err){
+                res.json({message: "Error please try again \n", error: err});
+            }
+            else if(found){
+                res.json({message: "Duplicate, movie already exists"});
+            }
+            else if (movie.actors.length < 3){
+                res.json({message: "Please enter at least 3 actors"});
+            }
+            else{
+                movie.save(function (err) {
+                    if(err){
+                        res.json({message: "Error please try again\n", error: err});
+                    }
+                    else{
+                        res.json({message: "Movie has successfully been saved"});
+                    }
+                })
+            }
+        });
+    })
+    //find a movie vy id
+    .get(authJwtController.isAuthenticated, function (req, res) {
+        var id = req.params.movieid;
+        Movie.findById(id, function (err, movie) {
+            if (err) res.send(err);
+            res.json(movie);
+        })
+    })
+
+    .delete(authJwtController.isAuthenticated, function (req, res){
+        Movie.findOneAndDelete({title: req.body.title}, function (err, movie) {
+            if (err)
+            {
+                res.status(400).json({message: "Error something went wrong please try again", msg: err})
+            }
+            else if(movie == null)
+            {
+                res.json({msg : "The movie was not found please make sure the ID is correct"})
+            }
+            else
+                res.json({msg :"The movie was successfully removed"})
+        })
+    })
+    //update movie by id
+    .put(authJwtController.isAuthenticated, function (req, res) {
+        var conditions = {_id: req.params.id};
+        Movie.findOne({title: req.body.title}, function(err) {
+            if (err) {
+                res.json({message: "Error something went wrong please try again\n", error: err});
+            }
+
+            else {
+                Movie.updateOne(conditions, req.body)
+                    .then(mov => {
+                        if (!mov) {
+                            return res.status(404).end();
+                        }
+                        return res.status(200).json({msg: "Movie has been updated"})
+                    })
+                    .catch(err => next(err))
+            }
+        })
+    });
 
 app.use('/', router);
 app.listen(process.env.PORT || 8080);
