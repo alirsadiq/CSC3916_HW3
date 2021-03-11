@@ -109,7 +109,7 @@ router.route('/movie')
             }
         });
     })
-    //find a movie vy id
+    //find a movie by title
     .get(authJwtController.isAuthenticated, function (req, res) {
         Movie.findOne({title : req.body.title}, function (err, movies) {
             if (err) res.send(err);
@@ -125,7 +125,7 @@ router.route('/movie')
             }
             else if(movie == null)
             {
-                res.json({msg : "The movie was not found please make sure the ID is correct"})
+                res.json({msg : "The movie was not found please make sure the title is correct"})
             }
             else
                 res.json({msg :"The movie was successfully removed"})
@@ -133,23 +133,37 @@ router.route('/movie')
     })
     //update movie
     .put(authJwtController.isAuthenticated, function (req, res) {
-        Movie.findOne({title: req.body.title}, function(err) {
-            if (err) {
-                res.json({message: "Error something went wrong please try again\n", error: err});
-            }
+            console.log(req.body);
+            var movie = new Movie();
+            movie.title = req.body.titleNew;
+            movie.yearReleased = req.body.yearReleased;
+            movie.genre = req.body.genre;
+            movie.actors = req.body.actors;
+            Movie.findOne({title: req.body.title}, function(err, found){
+                if(err){
+                    res.json({message: "Error please try again \n", error: err});
+                }
+                else if (movie.actors.length < 3){
+                    res.json({message: "Please enter at least 3 actors"});
+                }
 
-            else {
-                Movie.updateOne( req.body)
-                    .then(update => {
-                        if (!update) {
-                            return res.status(404).end();
+                else if(!found){
+                    res.json({message: "No movie found with that title"});
+                }
+
+                else{
+                    movie.save(function (err) {
+                        if(err){
+                            res.json({message: "Error please try again\n", error: err});
                         }
-                        return res.status(200).json({msg: "Movie has been updated"})
+                        else{
+                            res.json({message: "Movie has successfully been updated"});
+                        }
                     })
-                    .catch(err => next(err))
-            }
+                }
+            });
         })
-    });
+
 
 app.use('/', router);
 app.listen(process.env.PORT || 8080);
