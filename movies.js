@@ -1,14 +1,12 @@
-//Inspired by User.js file
-
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
 mongoose.Promise = global.Promise;
-
 mongoose.connect(process.env.DB, { useNewUrlParser: true } );
 mongoose.set('useCreateIndex', true);
 
 // movies schema
+
 var MovieSchema = new Schema({
     title: { type: String, required: true, index: { unique: true }},
     yearReleased: { type: Date, required: true },
@@ -17,4 +15,5 @@ var MovieSchema = new Schema({
 });
 
 // return the model
+
 module.exports = mongoose.model('Movie', MovieSchema);
