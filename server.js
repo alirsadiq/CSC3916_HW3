@@ -139,7 +139,7 @@ router.route('/movie')
             movie.yearReleased = req.body.yearReleased;
             movie.genre = req.body.genre;
             movie.actors = req.body.actors;
-            Movie.findOne({title: req.body.title}, function(err, found){
+            Movie.findOneAndDelete({title: req.body.title}, function(err, found){
                 if(err){
                     res.json({message: "Error please try again \n", error: err});
                 }
