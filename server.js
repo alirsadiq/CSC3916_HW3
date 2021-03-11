@@ -135,7 +135,7 @@ router.route('/movie')
     .put(authJwtController.isAuthenticated, function (req, res) {
             console.log(req.body);
             var movie = new Movie();
-            movie.title = req.body.titleNew;
+            movie.title = req.body.title;
             movie.yearReleased = req.body.yearReleased;
             movie.genre = req.body.genre;
             movie.actors = req.body.actors;
